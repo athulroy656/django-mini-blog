@@ -1,0 +1,552 @@
+/* Modern Blog Theme */
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --background-color: #f8fafc;
+    --text-color: #1e293b;
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --hover-color: #3b82f6;
+    --link-color: #2563eb;
+    --link-hover-color: #1e40af;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --danger-bg: #fee2e2;
+    --danger-text: #991b1b;
+    --list-group-bg: #ffffff;
+    --list-group-hover-bg: #f1f5f9;
+    --list-group-border-color: #e2e8f0;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: var(--card-bg) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+}
+
+.nav-link {
+    color: var(--text-color) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+/* Card Styling */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.card-text {
+    color: var(--text-color);
+    opacity: 0.9;
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: translateY(-1px);
+    color: white;
+}
+
+/* Form Styling */
+.form-control {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    color: var(--text-color);
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+.alert-success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+
+.alert-danger {
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+/* Toast Styling */
+.toast {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toast-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.toast-body {
+    color: var(--text-color);
+}
+
+/* Links */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Blog Post Styling */
+.blog-post {
+    margin-bottom: 2rem;
+}
+
+.blog-post-meta {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Author Profile */
+.author-profile {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* Footer */
+footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+footer a {
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--primary-color);
+}
+
+/* Text Colors */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.75rem 0;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* List Group Styling */
+.list-group-item {
+    background-color: var(--list-group-bg);
+    border-color: var(--list-group-border-color);
+    color: var(--text-color);
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--list-group-hover-bg);
+}
+
+.list-group-item-action {
+    color: var(--text-color);
+}
+
+.list-group-item-action:hover {
+    color: var(--primary-color);
+}
+
+/* Home Page Specific Styling */
+.card-title a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.card-title a:hover {
+    color: var(--primary-color);
+}
+
+.blog-post-meta a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.blog-post-meta a:hover {
+    color: var(--primary-color);
+}
+
+/* Quick Links Styling */
+.list-unstyled a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: block;
+    padding: 0.5rem 0;
+}
+
+.list-unstyled a:hover {
+    color: var(--primary-color);
+}
+
+.list-unstyled i {
+    margin-right: 0.5rem;
+    color: var(--text-muted);
+}
+
+/* Alert Info Styling */
+.alert-info {
+    background-color: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+/* Profile Picture Placeholder */
+.profile-placeholder {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Active Bloggers Section */
+.active-bloggers h6 {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.active-bloggers small {
+    color: var(--text-muted);
+}
+
+/* Card Body Padding */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Heading Styles */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* List Group Flush */
+.list-group-flush .list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-flush .list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-flush .list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* Blogger List Styling */
+.blogger-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blogger-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.blogger-name {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.blogger-name:hover {
+    color: var(--primary-color);
+}
+
+.blogger-bio {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.profile-placeholder-large {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+}
+
+/* Quick Links in Sidebar */
+.card .list-unstyled a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: block;
+    padding: 0.5rem 0;
+}
+
+.card .list-unstyled a:hover {
+    color: var(--primary-color);
+}
+
+.card .list-unstyled i {
+    color: var(--text-muted);
+    width: 20px;
+    text-align: center;
+}
+
+/* Blog Detail Page Styling */
+.comment {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--list-group-bg);
+    transition: background-color 0.2s ease;
+}
+
+.comment:hover {
+    background-color: var(--list-group-hover-bg);
+}
+
+.comment-author {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.comment-author:hover {
+    color: var(--primary-color);
+}
+
+.author-name {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.author-name:hover {
+    color: var(--primary-color);
+}
+
+.border-light {
+    border-color: var(--border-color) !important;
+}
+
+/* Blog Content Styling */
+.card-text p {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.card-text a {
+    color: var(--link-color);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.card-text a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Comment Form Styling */
+.form-control {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* Like Button Styling */
+.btn-like {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-like:hover {
+    transform: scale(1.1);
+}
+
+.btn-like i {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    transition: color 0.2s ease;
+}
+
+.btn-like i.text-danger {
+    color: #ef4444;
+}
+
+.btn-like:hover i:not(.text-danger) {
+    color: #ef4444;
+    opacity: 0.7;
+}
+
+/* Share Button Styling */
+.btn-share {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-share:hover {
+    transform: scale(1.1);
+}
+
+.btn-share i {
+    font-size: 1.25rem;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.btn-share:hover i {
+    color: #3b82f6;
+}
+
+#share-tooltip {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.btn-dislike {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-dislike:hover {
+    transform: scale(1.1);
+}
+
+.btn-dislike i {
+    font-size: 1.2rem;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.btn-dislike:hover i {
+    color: #dc3545;
+}
+
+.btn-dislike i.text-danger {
+    color: #dc3545;
+} 

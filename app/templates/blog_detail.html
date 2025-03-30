@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Mini Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{{ post.title }}</h1>
+                    <div class="blog-post-meta mb-3">
+                        By <a href="{% url 'blogger_detail' post.author.id %}">{{ post.author.username }}</a> 
+                        on {{ post.created_at|date:"F j, Y" }}
+                    </div>
+                    <div class="blog-post-content mb-4">
+                        {{ post.content|linebreaks }}
+                    </div>
+
+                    <!-- Like and Share Section -->
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-like me-2" data-post-id="{{ post.id }}">
+                            <i class="fas fa-heart {% if user in post.liked_by.all %}text-danger{% endif %}"></i>
+                        </button>
+                        <button class="btn btn-dislike me-2" data-post-id="{{ post.id }}">
+                            <i class="fas fa-thumbs-down {% if user in post.disliked_by.all %}text-danger{% endif %}"></i>
+                        </button>
+                        <span class="me-3" id="like-count-{{ post.id }}">{{ post.total_likes }}</span>
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    </div>
+                    <button class="btn btn-share me-2" onclick="sharePost()" title="Copy link to clipboard">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <span id="share-tooltip" class="ms-2 text-success" style="display: none;">
+                        Link copied!
+                    </span>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="card-title">Comments</h3>
+                    
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add_comment' post.id %}" class="mb-4">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea name="content" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    {% else %}
+                        <p class="text-muted">Please <a href="{% url 'login' %}">login</a> to leave a comment.</p>
+                    {% endif %}
+
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="comment mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ comment.author.username }}</strong>
+                                        <small class="text-muted ms-2">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
+                                    </div>
+                                </div>
+                                <p class="mb-1">{{ comment.content }}</p>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="border-light">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No comments yet. Be the first to comment!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About the Author</h5>
+                    <p class="card-text">{{ post.author.bio|default:"No bio available." }}</p>
+                    <a href="{% url 'blogger_detail' post.author.id %}" class="btn btn-outline-primary">View Profile</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Related Posts</h5>
+                    <ul class="list-unstyled mb-0">
+                        {% for related_post in related_posts %}
+                            <li class="mb-3">
+                                <a href="{% url 'blog_detail' related_post.id %}" class="text-decoration-none">
+                                    {{ related_post.title }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li class="text-muted">No related posts found.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Like button functionality
+    document.querySelectorAll('.btn-like').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const likeCount = document.getElementById(`like-count-${postId}`);
+            const heartIcon = this.querySelector('i');
+            
+            fetch(`/blog/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.liked) {
+                    heartIcon.classList.add('text-danger');
+                } else {
+                    heartIcon.classList.remove('text-danger');
+                }
+                likeCount.textContent = data.total_likes;
+            });
+        });
+    });
+
+    // Dislike button functionality
+    document.querySelectorAll('.btn-dislike').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const likeCount = document.getElementById(`like-count-${postId}`);
+            const thumbsDownIcon = this.querySelector('i');
+            
+            fetch(`/blog/${postId}/dislike/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.disliked) {
+                    thumbsDownIcon.classList.add('text-danger');
+                } else {
+                    thumbsDownIcon.classList.remove('text-danger');
+                }
+                likeCount.textContent = data.total_likes;
+            });
+        });
+    });
+});
+
+function sharePost() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        const tooltip = document.getElementById('share-tooltip');
+        tooltip.style.display = 'inline';
+        setTimeout(() => {
+            tooltip.style.display = 'none';
+        }, 2000);
+    });
+}
+</script>
+{% endblock %} 
