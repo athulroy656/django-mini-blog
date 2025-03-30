@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: django-mini-blog
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn blog.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true 
