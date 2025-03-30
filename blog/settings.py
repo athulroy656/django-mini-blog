@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'crispy_forms',
-    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -142,8 +141,7 @@ AUTHENTICATION_BACKENDS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Crispy Forms
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = 'home'
