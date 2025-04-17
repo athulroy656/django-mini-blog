@@ -9,18 +9,92 @@ from .models import User, BlogPost, Comment
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+from django.conf import settings
+
+# Database initialization - create tables if they don't exist
+import os
+import django
+import logging
+from django.db import connection
+
+logger = logging.getLogger(__name__)
+
+def ensure_tables_exist():
+    try:
+        # Check if we're on Render
+        if os.environ.get('RENDER'):
+            logger.info("Running on Render, checking database tables...")
+            
+            # Check if BlogPost table exists
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='app_blogpost';")
+                if not cursor.fetchone():
+                    logger.info("BlogPost table doesn't exist, running migrations...")
+                    # Run migrations manually
+                    from django.core.management import call_command
+                    call_command('makemigrations', 'app')
+                    call_command('migrate')
+                    
+                    # Create sample data
+                    create_sample_data()
+    except Exception as e:
+        logger.error(f"Error ensuring tables exist: {e}")
+
+def create_sample_data():
+    try:
+        # Only create data if BlogPost table is empty
+        if BlogPost.objects.count() == 0:
+            logger.info("Creating sample data...")
+            
+            # Create admin user if it doesn't exist
+            admin_user = User.objects.filter(username='admin').first()
+            if not admin_user:
+                admin_user = User.objects.create_superuser(
+                    username='admin',
+                    email='admin@example.com',
+                    password='admin',
+                    full_name='Admin User'
+                )
+            
+            # Create some blog posts
+            for i in range(1, 4):
+                BlogPost.objects.create(
+                    title=f'Sample Blog Post {i}',
+                    content=f'This is the content of blog post {i}. It contains some sample text.',
+                    author=admin_user,
+                    created_at=timezone.now()
+                )
+    except Exception as e:
+        logger.error(f"Error creating sample data: {e}")
+
+# Try to ensure tables exist when module is loaded
+ensure_tables_exist()
 
 # Create your views here.
 
 def home(request):
     # Get latest 3 blog posts
-    latest_posts = BlogPost.objects.all()[:3]
+    try:
+        latest_posts = BlogPost.objects.all()[:3]
+    except Exception as e:
+        # If there's an error, try to ensure tables exist and try again
+        logger.error(f"Error getting blog posts: {e}")
+        ensure_tables_exist()
+        # Try again with empty list as fallback
+        try:
+            latest_posts = BlogPost.objects.all()[:3]
+        except:
+            latest_posts = []
     
     # Get active bloggers (users who have posted in the last 30 days)
-    thirty_days_ago = timezone.now() - timedelta(days=30)
-    active_bloggers = User.objects.filter(
-        blog_posts__created_at__gte=thirty_days_ago
-    ).distinct().order_by('-blog_posts__created_at')[:5]
+    try:
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        active_bloggers = User.objects.filter(
+            blog_posts__created_at__gte=thirty_days_ago
+        ).distinct().order_by('-blog_posts__created_at')[:5]
+    except Exception as e:
+        logger.error(f"Error getting active bloggers: {e}")
+        active_bloggers = []
     
     return render(request, 'index.html', {
         'latest_posts': latest_posts,
@@ -208,10 +282,12 @@ def dislike_post(request, post_id):
         'total_likes': post.total_likes()
     })
 
-@login_required
 def saved_posts(request):
-    saved_posts = request.user.bookmarks.all().order_by('-created_at')
-    return render(request, 'saved_posts.html', {'posts': saved_posts})
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    bookmarked_posts = request.user.bookmarks.all()
+    return render(request, 'saved_posts.html', {'posts': bookmarked_posts})
 
 @login_required
 @require_POST
@@ -225,18 +301,39 @@ def toggle_bookmark(request, post_id):
         request.user.bookmarks.add(post)
         bookmarked = True
     
-    return JsonResponse({
-        'bookmarked': bookmarked
-    })
+    return JsonResponse({'bookmarked': bookmarked})
 
 @login_required
 @require_POST
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     
-    # Check if the user is the author of the comment
-    if request.user == comment.author:
+    # Only allow the comment author or post author to delete a comment
+    if request.user == comment.author or request.user == comment.post.author:
         comment.delete()
-        return JsonResponse({'status': 'success'})
+        messages.success(request, 'Comment deleted successfully!')
     else:
-        return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete this comment'}, status=403)
+        messages.error(request, 'You do not have permission to delete this comment.')
+    
+    return redirect('blog_detail', post_id=comment.post.id)
+
+def initialize_database(request):
+    from django.http import HttpResponse
+    
+    # Only allow this in debug mode or with admin access
+    if not request.user.is_superuser and not settings.DEBUG:
+        return HttpResponse("Unauthorized", status=401)
+    
+    try:
+        from django.core.management import call_command
+        
+        # Run migrations
+        call_command('makemigrations', 'app')
+        call_command('migrate')
+        
+        # Create data
+        create_sample_data()
+        
+        return HttpResponse("Database initialized successfully. <a href='/'>Go to homepage</a>")
+    except Exception as e:
+        return HttpResponse(f"Error initializing database: {str(e)}", status=500)
