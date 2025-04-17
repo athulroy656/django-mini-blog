@@ -5,8 +5,18 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
-# Collect static files
-cd /opt/render/project/src/django-mini-blog-main && python manage.py collectstatic --no-input
+# Make migrations to ensure model changes are captured
+echo "Making migrations..."
+python manage.py makemigrations app
 
 # Run migrations
-cd /opt/render/project/src/django-mini-blog-main && python manage.py migrate 
+echo "Running migrations..."
+python manage.py migrate
+
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --no-input
+
+# Create a superuser if one doesn't exist (optional)
+echo "Attempting to create a superuser..."
+echo "from app.models import User; User.objects.filter(is_superuser=True).exists() or User.objects.create_superuser('admin', 'admin@example.com', 'admin')" | python manage.py shell || true 
