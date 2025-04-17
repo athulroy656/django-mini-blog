@@ -3,7 +3,7 @@ services:
     name: django-mini-blog
     env: python
     buildCommand: ./build.sh
-    startCommand: gunicorn wsgi:application
+    startCommand: gunicorn --log-level debug wsgi:application
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -14,7 +14,9 @@ services:
       - key: DEBUG
         value: False
       - key: ALLOWED_HOSTS
-        value: django-mini-blog.onrender.com
+        value: django-mini-blog.onrender.com,*.onrender.com
+      - key: PYTHON_PATH
+        value: /opt/render/project/src:/opt/render/project/src/django-mini-blog-main
 
 databases:
   - name: django-mini-blog-db
