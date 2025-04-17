@@ -38,11 +38,34 @@ try:
                 modified_content = modified_content.replace('dj_database_url.config', 
                                                            '(dj_database_url.config if dj_database_url else lambda **kw: {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": os.path.join(BASE_DIR, "db.sqlite3")}})')
             
+            # Ensure ALLOWED_HOSTS is properly set for Render
+            if 'ALLOWED_HOSTS' in modified_content:
+                import re
+                allowed_hosts_pattern = r'ALLOWED_HOSTS\s*=\s*\[(.*?)\]'
+                match = re.search(allowed_hosts_pattern, modified_content, re.DOTALL)
+                if match:
+                    current_hosts = match.group(1)
+                    render_hosts = "'*', 'sblog-zpji.onrender.com', '.onrender.com'"
+                    if not any(host in current_hosts for host in ["'*'", "'.onrender.com'", "'sblog-zpji.onrender.com'"]):
+                        new_hosts = f"ALLOWED_HOSTS = [{current_hosts}, {render_hosts}]"
+                        modified_content = re.sub(allowed_hosts_pattern, new_hosts, modified_content, flags=re.DOTALL)
+            else:
+                # If ALLOWED_HOSTS is not defined, add it
+                modified_content += "\n# Added by deployment script\nALLOWED_HOSTS = ['*', 'sblog-zpji.onrender.com', '.onrender.com']\n"
+            
             # Execute the modified content
             exec(modified_content)
         else:
             # Execute original content if no modification needed
             exec(content)
+            
+        # Force update ALLOWED_HOSTS after execution
+        import django.conf
+        django.conf.settings.ALLOWED_HOSTS = list(set(
+            getattr(django.conf.settings, 'ALLOWED_HOSTS', []) + 
+            ['*', 'sblog-zpji.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
+        ))
+        
     else:
         raise ImportError(f"Cannot find settings module at {real_settings_module}")
         
@@ -55,7 +78,7 @@ except Exception as e:
     # Create minimal settings
     DEBUG = os.environ.get('DEBUG', 'True') == 'True'
     SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-for-development')
-    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+    ALLOWED_HOSTS = ['*', 'sblog-zpji.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
     
     # Database settings
     DATABASES = {
@@ -73,6 +96,36 @@ except Exception as e:
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'app',
+        'corsheaders',
+    ]
+    
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+    
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(project_dir, 'app', 'templates')],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
     ]
     
     # Set these minimal settings
