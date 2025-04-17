@@ -1,1 +1,1 @@
-web: cd django-mini-blog-main && gunicorn blog.wsgi:application 
+web: cd /opt/render/project/src/django-mini-blog-main && gunicorn wsgi_wrapper:application 
