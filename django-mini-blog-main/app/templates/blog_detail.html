@@ -10,7 +10,7 @@
         
         <div class="flex items-center justify-between mb-6">
             <div class="text-gray-600">
-                By <a href="{% url 'author_detail' post.author.id %}" class="text-blue-600 hover:text-blue-800">
+                By <a href="{% url 'blogger_detail' post.author.id %}" class="text-blue-600 hover:text-blue-800">
                     {{ post.author.username }}
                 </a>
                 on {{ post.created_at|date:"F j, Y" }}
