@@ -85,11 +85,10 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',  # SQLite engine
+        'NAME': BASE_DIR / 'db.sqlite3',  # Path to the SQLite database file
+    }
 }
 
 
