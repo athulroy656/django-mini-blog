@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Saved Posts</h1>
+    
+    {% if posts %}
+        <div class="grid gap-6">
+            {% for post in posts %}
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-2xl font-bold mb-2">
+                    <a href="{% url 'blog_detail' post.id %}" class="text-blue-600 hover:text-blue-800">
+                        {{ post.title }}
+                    </a>
+                </h2>
+                <div class="text-gray-600 mb-4">
+                    By {{ post.author.username }} on {{ post.created_at|date:"F j, Y" }}
+                </div>
+                <div class="prose max-w-none mb-4">
+                    {{ post.content|truncatewords:50 }}
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="bookmark-btn text-blue-600 hover:text-blue-800" 
+                            data-post-id="{{ post.id }}"
+                            data-bookmarked="true">
+                        <i class="fas fa-bookmark"></i> Saved
+                    </button>
+                    <span class="text-gray-500">
+                        {{ post.total_likes }} likes
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center text-gray-500 py-8">
+            <p class="text-xl mb-4">You haven't saved any posts yet.</p>
+            <a href="{% url 'blog_list' %}" class="text-blue-600 hover:text-blue-800">
+                Browse posts to save some!
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.bookmark-btn').forEach(button => {
+    button.addEventListener('click', async function() {
+        const postId = this.dataset.postId;
+        try {
+            const response = await fetch(`/blog/${postId}/bookmark/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+            });
+            const data = await response.json();
+            
+            if (data.bookmarked) {
+                this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                this.dataset.bookmarked = 'true';
+            } else {
+                this.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                this.dataset.bookmarked = 'false';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
