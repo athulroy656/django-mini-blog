@@ -6,7 +6,7 @@ set -o errexit
 pip install -r requirements.txt
 
 # Collect static files
-python manage.py collectstatic --no-input
+cd django-mini-blog-main && python manage.py collectstatic --no-input
 
 # Run migrations
-python manage.py migrate 
+cd django-mini-blog-main && python manage.py migrate 

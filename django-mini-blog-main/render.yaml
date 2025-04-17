@@ -5,8 +5,8 @@ services:
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-    startCommand: gunicorn blog.wsgi:application
+      cd django-mini-blog-main && python manage.py collectstatic --noinput
+    startCommand: cd django-mini-blog-main && gunicorn blog.wsgi:application
     envVars:
       - key: DATABASE_URL
         fromDatabase:
