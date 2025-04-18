@@ -20,6 +20,7 @@ urlpatterns = [
     path('saved-posts/', views.saved_posts, name='saved_posts'),
     path('blog/<int:post_id>/bookmark/', views.toggle_bookmark, name='toggle_bookmark'),
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
+    path('create-blog/', views.create_blog, name='create_blog'),
     # Special initialization endpoint
     path('init-database/', views.initialize_database, name='initialize_database'),
 ] 

@@ -142,6 +142,39 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Delete comment functionality
+document.querySelectorAll('.delete-comment-btn').forEach(button => {
+    button.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const commentId = this.dataset.commentId;
+        
+        if (confirm('Are you sure you want to delete this comment?')) {
+            try {
+                const response = await fetch(`/comment/${commentId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    // Remove the comment from the DOM
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    if (commentElement) {
+                        commentElement.remove();
+                    }
+                } else {
+                    alert('Failed to delete comment');
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                alert('An error occurred while deleting the comment');
+            }
+        }
+    });
+});
+
 // Bookmark functionality
 document.querySelectorAll('.bookmark-btn').forEach(button => {
     button.addEventListener('click', async function() {

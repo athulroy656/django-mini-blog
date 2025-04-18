@@ -45,6 +45,11 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
+                            <a href="{% url 'create_blog' %}" class="nav-link">
+                                <i class="fas fa-edit"></i> Write Blog
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{% url 'saved_posts' %}" class="nav-link">
                                 <i class="fas fa-bookmark"></i> Saved Posts
                             </a>

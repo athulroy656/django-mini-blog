@@ -243,6 +243,31 @@ def blogger_list(request):
     return render(request, 'blogger_list.html', {'bloggers': bloggers})
 
 @login_required
+def create_blog(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        content = request.POST.get('content', '').strip()
+        
+        if not title or not content:
+            messages.error(request, 'Both title and content are required')
+            return redirect('create_blog')
+            
+        try:
+            blog_post = BlogPost.objects.create(
+                title=title,
+                content=content,
+                author=request.user,
+                created_at=timezone.now()
+            )
+            messages.success(request, 'Blog post created successfully!')
+            return redirect('blog_detail', post_id=blog_post.id)
+        except Exception as e:
+            messages.error(request, f'Error creating blog post: {str(e)}')
+            return redirect('create_blog')
+    
+    return render(request, 'create_blog.html')
+
+@login_required
 @require_POST
 def like_post(request, post_id):
     post = get_object_or_404(BlogPost, id=post_id)
@@ -300,17 +325,25 @@ def toggle_bookmark(request, post_id):
     else:
         request.user.bookmarks.add(post)
         bookmarked = True
-    
-    return JsonResponse({'bookmarked': bookmarked})
+
+    return JsonResponse({
+        'bookmarked': bookmarked,
+        'total_likes': post.total_likes()
+    })
 
 @login_required
 @require_POST
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
-    
-    # Only allow the comment author or post author to delete a comment
-    if request.user == comment.author or request.user == comment.post.author:
+
+    if comment.author != request.user:
+        return JsonResponse({'error': 'You can only delete your own comments'}, status=403)
+
+    try:
         comment.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
         messages.success(request, 'Comment deleted successfully!')
     else:
         messages.error(request, 'You do not have permission to delete this comment.')
